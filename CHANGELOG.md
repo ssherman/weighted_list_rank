@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.1.2] - 2024-02-03
+
+- Added list weight to rank result
+- 
 ## [0.1.1] - 2024-02-03
 
 - Fixed Exponential strategy to just return the list weight if the item has a nil position
