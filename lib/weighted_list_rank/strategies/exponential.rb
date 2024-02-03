@@ -29,6 +29,10 @@ module WeightedListRank
       # @return [Float] the calculated score for the item, adjusted by the list's weight and the specified exponent.
       def calculate_score(list, item)
         rank_position = item.position
+
+        # if there are no positions, then just return the list weight
+        return list.weight if rank_position.nil?
+
         num_items = list.items.count
 
         contribution = ((num_items + 1 - rank_position)**exponent) / num_items.to_f
