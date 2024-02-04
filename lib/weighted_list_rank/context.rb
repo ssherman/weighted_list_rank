@@ -34,7 +34,8 @@ module WeightedListRank
       sorted_items = items.map do |id, details|
         {
           id: id,
-          score_details: details[:list_details],
+          # Sort the score_details array by score in descending order before including it
+          score_details: details[:list_details].sort_by { |detail| -detail[:score] },
           total_score: details[:total_score]
         }
       end
