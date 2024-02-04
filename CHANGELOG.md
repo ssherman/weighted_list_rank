@@ -1,8 +1,12 @@
 ## [Unreleased]
 
+## [0.2.0] - 2024-02-03
+
+- refactored the exponential algorithm to only add bonus points out of a pool of 50% of a list's weight
+
 ## [0.1.3] - 2024-02-03
 
-- sprt the score_details by the highest score from each list first
+- sort the score_details by the highest score from each list first
 
 ## [0.1.2] - 2024-02-03
 

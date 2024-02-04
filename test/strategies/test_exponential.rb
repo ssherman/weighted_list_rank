@@ -25,8 +25,8 @@ module WeightedListRank
       score_item_1 = @strategy.calculate_score(@list_with_positions, @list_with_positions.items.first)
       score_item_2 = @strategy.calculate_score(@list_with_positions, @list_with_positions.items[1])
 
-      expected_score_item_1 = 15.77 # Adjust based on your formula
-      expected_score_item_2 = 13.14 # Adjust based on your formula
+      expected_score_item_1 = 12.87
+      expected_score_item_2 = 11.56
 
       assert_in_delta expected_score_item_1, score_item_1, 0.01
       assert_in_delta expected_score_item_2, score_item_2, 0.01
