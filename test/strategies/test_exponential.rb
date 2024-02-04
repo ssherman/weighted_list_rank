@@ -24,9 +24,11 @@ module WeightedListRank
     def test_calculate_score_with_default_exponent
       score_item_1 = @strategy.calculate_score(@list_with_positions, @list_with_positions.items.first)
       score_item_2 = @strategy.calculate_score(@list_with_positions, @list_with_positions.items[1])
+      puts score_item_1
+      puts score_item_2
 
-      expected_score_item_1 = 12.87
-      expected_score_item_2 = 11.56
+      expected_score_item_1 = 15.75
+      expected_score_item_2 = 13.13
 
       assert_in_delta expected_score_item_1, score_item_1, 0.01
       assert_in_delta expected_score_item_2, score_item_2, 0.01

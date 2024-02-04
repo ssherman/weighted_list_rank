@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.3.0] - 2024-02-03
+
+- added bonus_pool_percentage feature to expoential
+
 ## [0.2.0] - 2024-02-03
 
 - refactored the exponential algorithm to only add bonus points out of a pool of 50% of a list's weight
