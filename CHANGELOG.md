@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.3.1] - 2024-05-026
+
+- Fixed issue with lists with only a single item getting bonus points
+
 ## [0.3.0] - 2024-02-03
 
 - added bonus_pool_percentage feature to expoential

@@ -19,6 +19,9 @@ module WeightedListRank
       @list_with_nil_position = MockList.new("List 2", 15, [
         MockItem.new("Item 4", nil) # Item with nil position
       ])
+      @list_with_one_item = MockList.new("List 3", 20, [
+        MockItem.new("Item 5", 1) # Only one item in the list
+      ])
     end
 
     def test_calculate_score_with_default_exponent
@@ -38,6 +41,12 @@ module WeightedListRank
       score_item_4 = @strategy.calculate_score(@list_with_nil_position, @list_with_nil_position.items.first)
 
       assert_equal 15, score_item_4, "Score should equal list weight for items with nil position"
+    end
+
+    def test_calculate_score_with_one_item
+      score_item_5 = @strategy.calculate_score(@list_with_one_item, @list_with_one_item.items.first)
+
+      assert_equal 20, score_item_5, "Score should equal list weight for lists with only one item"
     end
   end
 end

@@ -43,7 +43,7 @@ module WeightedListRank
       # and the bonus pool percentage.
       def calculate_score(list, item)
         # Return the list weight if there are no positions
-        return list.weight if item.position.nil?
+        return list.weight if item.position.nil? || list.items.count == 1
 
         num_items = list.items.count
         total_bonus_pool = list.weight * bonus_pool_percentage
