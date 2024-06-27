@@ -92,6 +92,78 @@ custom_ranked_items.each do |item|
 end
 ```
 
+### Using Item Penalties
+The WeightedListRank system also supports applying penalties to individual items. A penalty is defined as a percentage reduction in the item's score. This feature can be used to de-emphasize certain items based on specific criteria.
+
+To use the penalty feature, include the score_penalty attribute when defining your items:
+
+```ruby
+class MyItem
+  include WeightedListRank::Item
+  attr_reader :id, :position, :score_penalty
+
+  def initialize(id, position, score_penalty = nil)
+    @id = id
+    @position = position
+    @score_penalty = score_penalty
+  end
+end
+```
+
+You can then apply the penalties when calculating the scores:
+
+```ruby
+require 'weighted_list_rank'
+
+# Initialize items and list with text identifiers and penalties
+items = [
+  MyItem.new("Item 1", 1, 0.20), # 20% penalty
+  MyItem.new("Item 2", 2, 0.10), # 10% penalty
+  MyItem.new("Item 3", 3, nil)   # No penalty
+]
+list = MyList.new("List 1", 10, items)
+
+# Initialize the Exponential strategy with an optional exponent
+exponential_strategy = WeightedListRank::Strategies::Exponential.new(exponent: 1.5)
+
+# Create a RankingContext using the Exponential strategy
+ranking_context = WeightedListRank::RankingContext.new(exponential_strategy)
+
+# Rank the items
+ranked_items = ranking_context.rank([list])
+
+# Display the ranked items
+ranked_items.each do |item|
+  puts "Item: #{item[:id]}, Total Score: #{item[:total_score]}"
+end
+```
+
+### Customizing Penalties Example
+You can customize the penalty values to see how they affect the final scores of the items.
+
+```ruby
+# Customizing penalties for different items
+items = [
+  MyItem.new("Item 1", 1, 0.30), # 30% penalty
+  MyItem.new("Item 2", 2, 0.15), # 15% penalty
+  MyItem.new("Item 3", 3, nil)   # No penalty
+]
+list = MyList.new("List 1", 10, items)
+
+# Initialize the Exponential strategy with an optional exponent
+exponential_strategy = WeightedListRank::Strategies::Exponential.new(exponent: 2.0)
+
+# Create a RankingContext using the Exponential strategy
+ranking_context = WeightedListRank::RankingContext.new(exponential_strategy)
+
+# Rank the items
+ranked_items = ranking_context.rank([list])
+
+# Output the results
+ranked_items.each do |item|
+  puts "Item: #{item[:id]}, Total Score: #{item[:total_score]}"
+end
+```
 
 ## Development
 

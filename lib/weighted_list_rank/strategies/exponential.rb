@@ -42,21 +42,38 @@ module WeightedListRank
       # @return [Float] the calculated score for the item, adjusted by the list's weight, the specified exponent,
       # and the bonus pool percentage.
       def calculate_score(list, item)
-        # Return the list weight if there are no positions
-        return list.weight if item.position.nil? || list.items.count == 1
+        # Default score to the list's weight
+        score = list.weight
 
-        num_items = list.items.count
-        total_bonus_pool = list.weight * bonus_pool_percentage
+        unless item.position.nil? || list.items.count == 1
+          num_items = list.items.count
+          total_bonus_pool = list.weight * bonus_pool_percentage
 
-        # Calculate the exponential factor for the item's rank position
-        exponential_factor = (num_items + 1 - item.position)**exponent
-        total_exponential_factor = (1..num_items).sum { |pos| (num_items + 1 - pos)**exponent }
+          # Calculate the exponential factor for the item's rank position
+          exponential_factor = (num_items + 1 - item.position)**exponent
+          total_exponential_factor = (1..num_items).sum { |pos| (num_items + 1 - pos)**exponent }
 
-        # Allocate a portion of the total bonus pool based on the item's exponential factor
-        item_bonus = (exponential_factor / total_exponential_factor) * total_bonus_pool
+          # Allocate a portion of the total bonus pool based on the item's exponential factor
+          item_bonus = (exponential_factor / total_exponential_factor) * total_bonus_pool
 
-        # The final score is the list's weight plus the item's allocated bonus
-        list.weight + item_bonus
+          # Add the item's allocated bonus to the default score
+          score += item_bonus
+        end
+
+        # Apply score penalty if it exists
+        apply_penalty(score, item.score_penalty)
+      end
+
+      private
+
+      # Applies the score penalty if it exists
+      #
+      # @param score [Float] the original score of the item
+      # @param penalty [Float, NilClass] the score penalty of the item as a percentage (e.g., 0.20 for 20%) or nil if no penalty
+      #
+      # @return [Float] the score after applying the penalty
+      def apply_penalty(score, penalty)
+        penalty ? score * (1 - penalty) : score
       end
     end
   end

@@ -1,12 +1,16 @@
 ## [Unreleased]
 
+## [0.4.0] - 2024-06-26
+- Added score_penalty feature to allow percentage-based penalties on item scores.
+- Updated all dependencies to their latest versions.
+
 ## [0.3.1] - 2024-05-026
 
 - Fixed issue with lists with only a single item getting bonus points
 
 ## [0.3.0] - 2024-02-03
 
-- added bonus_pool_percentage feature to expoential
+- added bonus_pool_percentage feature to exponential
 
 ## [0.2.0] - 2024-02-03
 

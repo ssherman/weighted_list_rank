@@ -22,13 +22,21 @@ module WeightedListRank
       @list_with_one_item = MockList.new("List 3", 20, [
         MockItem.new("Item 5", 1) # Only one item in the list
       ])
+
+      # Setup lists with score penalties
+      @list_with_penalties = MockList.new("List 4", 10, [
+        MockItem.new("Item 6", 1, 0.20), # 20% penalty
+        MockItem.new("Item 7", 2, 0.10), # 10% penalty
+        MockItem.new("Item 8", 3, nil)   # No penalty
+      ])
+      @list_with_penalty_and_nil_position = MockList.new("List 5", 15, [
+        MockItem.new("Item 9", nil, 0.15) # 15% penalty and nil position
+      ])
     end
 
     def test_calculate_score_with_default_exponent
       score_item_1 = @strategy.calculate_score(@list_with_positions, @list_with_positions.items.first)
       score_item_2 = @strategy.calculate_score(@list_with_positions, @list_with_positions.items[1])
-      puts score_item_1
-      puts score_item_2
 
       expected_score_item_1 = 15.75
       expected_score_item_2 = 13.13
@@ -47,6 +55,28 @@ module WeightedListRank
       score_item_5 = @strategy.calculate_score(@list_with_one_item, @list_with_one_item.items.first)
 
       assert_equal 20, score_item_5, "Score should equal list weight for lists with only one item"
+    end
+
+    def test_calculate_score_with_penalties
+      score_item_6 = @strategy.calculate_score(@list_with_penalties, @list_with_penalties.items.first)
+      score_item_7 = @strategy.calculate_score(@list_with_penalties, @list_with_penalties.items[1])
+      score_item_8 = @strategy.calculate_score(@list_with_penalties, @list_with_penalties.items[2])
+
+      expected_score_item_6 = 15.75 * 0.80 # 20% penalty
+      expected_score_item_7 = 13.13 * 0.90 # 10% penalty
+      expected_score_item_8 = 11.10
+
+      assert_in_delta expected_score_item_6, score_item_6, 0.01
+      assert_in_delta expected_score_item_7, score_item_7, 0.01
+      assert_in_delta expected_score_item_8, score_item_8, 0.01
+    end
+
+    def test_calculate_score_with_penalty_and_nil_position
+      score_item_9 = @strategy.calculate_score(@list_with_penalty_and_nil_position, @list_with_penalty_and_nil_position.items.first)
+
+      expected_score_item_9 = 15 * 0.85 # 15% penalty
+
+      assert_in_delta expected_score_item_9, score_item_9, 0.01
     end
   end
 end
