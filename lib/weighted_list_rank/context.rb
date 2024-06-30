@@ -22,7 +22,7 @@ module WeightedListRank
           items[item.id] ||= {}
           # Ensure the list_details array exists, then append the new score detail
           items[item.id][:list_details] ||= []
-          items[item.id][:list_details] << {list_id: list.id, score: score, weight: list.weight}
+          items[item.id][:list_details] << {list_id: list.id, score: score, weight: list.weight, score_penalty: item.score_penalty}
 
           # Ensure the total_score is initialized, then add the score
           items[item.id][:total_score] ||= 0

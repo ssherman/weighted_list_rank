@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.4.1] - 2024-06-30
+- add score_penalty to the list details hash
+
 ## [0.4.0] - 2024-06-26
 - Added score_penalty feature to allow percentage-based penalties on item scores.
 - Updated all dependencies to their latest versions.
