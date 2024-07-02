@@ -61,7 +61,10 @@ module WeightedListRank
         end
 
         # Apply score penalty if it exists
-        apply_penalty(score, item.score_penalty)
+        score = apply_penalty(score, item.score_penalty)
+
+        # Ensure the score is not less than 1
+        [score, 1].max
       end
 
       private

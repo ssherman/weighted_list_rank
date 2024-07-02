@@ -78,5 +78,19 @@ module WeightedListRank
 
       assert_in_delta expected_score_item_9, score_item_9, 0.01
     end
+
+    def test_calculate_score_with_minimum_floor
+      list_with_low_scores = MockList.new("List 6", 1, [
+        MockItem.new("Item 10", 1, 0.99), # 99% penalty
+        MockItem.new("Item 11", 2, 0.99)  # 99% penalty
+      ])
+
+      score_item_10 = @strategy.calculate_score(list_with_low_scores, list_with_low_scores.items.first)
+      score_item_11 = @strategy.calculate_score(list_with_low_scores, list_with_low_scores.items[1])
+
+      # Ensure the score is not less than 1
+      assert_equal 1, score_item_10, "Score should not be less than 1 even with high penalties"
+      assert_equal 1, score_item_11, "Score should not be less than 1 even with high penalties"
+    end
   end
 end

@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.4.2] - 2024-07-01
+- fixed bug where a score could be set to 0. the lowest a score can be now is 1
+
 ## [0.4.1] - 2024-06-30
 - add score_penalty to the list details hash
 
