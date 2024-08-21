@@ -92,6 +92,45 @@ custom_ranked_items.each do |item|
 end
 ```
 
+### New Features: average_list_length and include_unranked_items
+#### average_list_length
+The average_list_length setting adjusts the bonus pool based on the typical size of lists across your system. This value can be calculated as the mean or median number of items across all lists. It helps prevent smaller lists from receiving disproportionately large bonuses.
+
+```ruby
+# Customizing with average_list_length
+strategy_with_avg_length = WeightedListRank::Strategies::Exponential.new(
+  exponent: 1.5,
+  average_list_length: 50  # Use mean or median list length
+)
+
+ranking_context_with_avg = WeightedListRank::RankingContext.new(strategy_with_avg_length)
+ranked_items = ranking_context_with_avg.rank([list])
+
+# Output the results
+ranked_items.each do |item|
+  puts "Item: #{item[:id]}, Total Score: #{item[:total_score]}"
+end
+```
+
+#### include_unranked_items
+The include_unranked_items setting allows you to distribute a portion of the bonus pool to unranked items. Ranked items receive an exponential bonus, while unranked items split the remaining bonus pool evenly. This feature ensures that unranked lists are still valuable and fairly scored.
+
+```ruby
+# Including unranked items in the bonus pool
+strategy_with_unranked = WeightedListRank::Strategies::Exponential.new(
+  exponent: 1.5,
+  include_unranked_items: true
+)
+
+ranking_context_with_unranked = WeightedListRank::RankingContext.new(strategy_with_unranked)
+ranked_items = ranking_context_with_unranked.rank([list])
+
+# Output the results
+ranked_items.each do |item|
+  puts "Item: #{item[:id]}, Total Score: #{item[:total_score]}"
+end
+```
+
 ### Using Item Penalties
 The WeightedListRank system also supports applying penalties to individual items. A penalty is defined as a percentage reduction in the item's score. This feature can be used to de-emphasize certain items based on specific criteria.
 

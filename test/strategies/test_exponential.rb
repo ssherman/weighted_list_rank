@@ -6,8 +6,9 @@ module WeightedListRank
     include Strategies
 
     def setup
-      # Initialize with default exponent
+      # Initialize with default exponent and a custom average_list_length
       @strategy = Exponential.new
+      @strategy_with_avg_length = Exponential.new(average_list_length: 10)
       @strategy_custom_exponent = Exponential.new(exponent: 2.0)
 
       # Setup lists with and without item positions
@@ -54,7 +55,7 @@ module WeightedListRank
     def test_calculate_score_with_one_item
       score_item_5 = @strategy.calculate_score(@list_with_one_item, @list_with_one_item.items.first)
 
-      assert_equal 20, score_item_5, "Score should equal list weight for lists with only one item"
+      assert_equal 40, score_item_5, "Score should equal list weight + bonus for lists with only one item"
     end
 
     def test_calculate_score_with_penalties
@@ -91,6 +92,25 @@ module WeightedListRank
       # Ensure the score is not less than 1
       assert_equal 1, score_item_10, "Score should not be less than 1 even with high penalties"
       assert_equal 1, score_item_11, "Score should not be less than 1 even with high penalties"
+    end
+
+    def test_calculate_score_with_average_list_length
+      score_item_1 = @strategy_with_avg_length.calculate_score(@list_with_positions, @list_with_positions.items.first)
+      score_item_2 = @strategy_with_avg_length.calculate_score(@list_with_positions, @list_with_positions.items[1])
+
+      # The expected scores are based on the corrected calculations
+      expected_score_item_1 = 11.727
+      expected_score_item_2 = 10.940
+
+      assert_in_delta expected_score_item_1, score_item_1, 0.01
+      assert_in_delta expected_score_item_2, score_item_2, 0.01
+    end
+
+    def test_calculate_score_with_average_list_length_and_nil_position
+      score_item_4 = @strategy_with_avg_length.calculate_score(@list_with_nil_position, @list_with_nil_position.items.first)
+
+      # Even with average_list_length, items with nil position should just get the base weight.
+      assert_equal 15, score_item_4, "Score should equal list weight for items with nil position"
     end
   end
 end

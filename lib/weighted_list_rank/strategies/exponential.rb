@@ -1,40 +1,31 @@
 module WeightedListRank
   module Strategies
-    # The Exponential strategy calculates the score of an item within a list using an exponential formula.
-    # This strategy emphasizes the significance of an item's rank within the list, where items with higher
-    # ranks (closer to 1) are exponentially more valuable than those with lower ranks. The magnitude of the bonus
-    # applied to each item's score is determined by the bonus pool percentage of the list's total weight.
-    #
-    # The exponential nature of the calculation is controlled by the +exponent+ attribute, allowing for
-    # flexible adjustment of how steeply the score decreases as rank increases. The +bonus_pool_percentage+
-    # attribute determines the size of the bonus pool as a percentage of the list's total weight, allowing
-    # customization of the bonus impact on the final scores.
     class Exponential < WeightedListRank::Strategy
-      # The exponent used in the score calculation formula. Higher values increase the rate at which
-      # scores decrease as item rank increases.
-      #
-      # @return [Float] the exponent value
-      attr_reader :exponent
+      attr_reader :exponent, :bonus_pool_percentage, :average_list_length, :include_unranked_items
 
-      # The percentage of the list's total weight that constitutes the bonus pool. This value determines
-      # how the total bonus pool is calculated as a percentage of the list's weight.
+      # Initializes the Exponential strategy with optional parameters for exponent,
+      # bonus pool percentage, average list length, and whether to include unranked items in the bonus pool.
       #
-      # @return [Float] the bonus pool percentage, defaulting to 1.0 (100% of the list's weight).
-      attr_reader :bonus_pool_percentage
-
-      # Initializes a new instance of the Exponential strategy with optional parameters for exponent and
-      # bonus pool percentage.
       # @param exponent [Float] the exponent to use in the score calculation formula, defaults to 1.5.
       # @param bonus_pool_percentage [Float] the percentage of the list's weight to be used as the bonus pool,
       # defaults to 1.0 (100%).
-      def initialize(exponent: 1.5, bonus_pool_percentage: 1.0)
+      # @param average_list_length [Float, NilClass] the average length of lists in the system, either as a mean or median,
+      # defaults to nil.
+      # @param include_unranked_items [Boolean] whether to include unranked items in the bonus pool calculation,
+      # defaults to false for backward compatibility.
+      def initialize(exponent: 1.5, bonus_pool_percentage: 1.0, average_list_length: nil, include_unranked_items: false)
         @exponent = exponent
         @bonus_pool_percentage = bonus_pool_percentage
+        @average_list_length = average_list_length
+        @include_unranked_items = include_unranked_items
       end
 
       # Calculates the score of an item within a list based on its rank position, the total number of items,
       # and the list's weight, using an exponential formula. The bonus pool for score adjustments is determined
-      # by the specified bonus pool percentage of the list's total weight.
+      # by the specified bonus pool percentage of the list's total weight, adjusted by the average list length.
+      #
+      # If +include_unranked_items+ is true, unranked items will also receive a portion of the bonus pool.
+      # Ranked items will receive an exponential bonus, while unranked items will split the remaining bonus pool evenly.
       #
       # @param list [WeightedListRank::List] the list containing the item being scored.
       # @param item [WeightedListRank::Item] the item for which to calculate the score.
@@ -45,18 +36,35 @@ module WeightedListRank
         # Default score to the list's weight
         score = list.weight
 
-        unless item.position.nil? || list.items.count == 1
-          num_items = list.items.count
-          total_bonus_pool = list.weight * bonus_pool_percentage
+        # Determine the number of ranked and unranked items
+        ranked_items = list.items.select { |i| i.position }
+        unranked_items = list.items.reject { |i| i.position }
+        num_ranked_items = ranked_items.count
+        num_unranked_items = unranked_items.count
 
-          # Calculate the exponential factor for the item's rank position
-          exponential_factor = (num_items + 1 - item.position)**exponent
-          total_exponential_factor = (1..num_items).sum { |pos| (num_items + 1 - pos)**exponent }
+        # Calculate the total bonus pool
+        total_bonus_pool = list.weight * bonus_pool_percentage
 
-          # Allocate a portion of the total bonus pool based on the item's exponential factor
-          item_bonus = (exponential_factor / total_exponential_factor) * total_bonus_pool
+        # Adjust the bonus pool based on the average list length
+        adjusted_bonus_pool = if average_list_length && average_list_length > 0
+          total_bonus_pool * (list.items.count / average_list_length.to_f)
+        else
+          total_bonus_pool
+        end
 
-          # Add the item's allocated bonus to the default score
+        if item.position.nil?
+          # If the item is unranked, give it an equal share of the remaining bonus pool
+          if include_unranked_items && num_unranked_items > 0
+            unranked_bonus = adjusted_bonus_pool / list.items.count
+            score += unranked_bonus
+          end
+        else
+          # If the item is ranked, calculate its bonus using the exponential formula
+          exponential_factor = (num_ranked_items + 1 - item.position)**exponent
+          total_exponential_factor = (1..num_ranked_items).sum { |pos| (num_ranked_items + 1 - pos)**exponent }
+
+          # Allocate a portion of the adjusted bonus pool based on the item's exponential factor
+          item_bonus = (exponential_factor / total_exponential_factor) * adjusted_bonus_pool
           score += item_bonus
         end
 
@@ -69,12 +77,6 @@ module WeightedListRank
 
       private
 
-      # Applies the score penalty if it exists
-      #
-      # @param score [Float] the original score of the item
-      # @param penalty [Float, NilClass] the score penalty of the item as a percentage (e.g., 0.20 for 20%) or nil if no penalty
-      #
-      # @return [Float] the score after applying the penalty
       def apply_penalty(score, penalty)
         penalty ? score * (1 - penalty) : score
       end
