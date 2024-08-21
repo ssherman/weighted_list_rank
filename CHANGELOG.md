@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.5.1] - 2024-07-23
+- Updated the `Exponential` strategy to prevent unranked items from receiving bonus points if the list contains both ranked and unranked items. In such cases, unranked items will now only receive the base weight of the list, ensuring ranked items are always prioritized.
+
 ## [0.5.0] - 2024-07-23
 - Added `average_list_length` feature to the `Exponential` strategy to adjust the bonus pool based on the average number of items across all lists. This helps prevent smaller lists from receiving disproportionately large bonuses.
 - Introduced a new configuration option `include_unranked_items` in the `Exponential` strategy. When enabled, unranked items will receive an equal share of the bonus pool, while ranked items will receive an exponential bonus.

@@ -36,32 +36,38 @@ module WeightedListRank
         # Default score to the list's weight
         score = list.weight
 
-        # Determine the number of ranked and unranked items
+        # Total number of items in the list
+        total_items = list.items.count
+
+        # Separate ranked and unranked items
         ranked_items = list.items.select { |i| i.position }
-        unranked_items = list.items.reject { |i| i.position }
         num_ranked_items = ranked_items.count
-        num_unranked_items = unranked_items.count
+
+        if num_ranked_items > 0 && item.position.nil?
+          # If there are ranked items, unranked items get no bonus, only the list's weight
+          return score
+        end
 
         # Calculate the total bonus pool
         total_bonus_pool = list.weight * bonus_pool_percentage
 
         # Adjust the bonus pool based on the average list length
         adjusted_bonus_pool = if average_list_length && average_list_length > 0
-          total_bonus_pool * (list.items.count / average_list_length.to_f)
+          total_bonus_pool * (total_items / average_list_length.to_f)
         else
           total_bonus_pool
         end
 
         if item.position.nil?
-          # If the item is unranked, give it an equal share of the remaining bonus pool
-          if include_unranked_items && num_unranked_items > 0
-            unranked_bonus = adjusted_bonus_pool / list.items.count
+          # Unranked items get no bonus if there are ranked items
+          if include_unranked_items && num_ranked_items == 0
+            unranked_bonus = adjusted_bonus_pool / total_items
             score += unranked_bonus
           end
         else
-          # If the item is ranked, calculate its bonus using the exponential formula
-          exponential_factor = (num_ranked_items + 1 - item.position)**exponent
-          total_exponential_factor = (1..num_ranked_items).sum { |pos| (num_ranked_items + 1 - pos)**exponent }
+          # Ranked items receive a bonus calculated using the exponential formula
+          exponential_factor = (total_items + 1 - item.position)**exponent
+          total_exponential_factor = (1..total_items).sum { |pos| (total_items + 1 - pos)**exponent }
 
           # Allocate a portion of the adjusted bonus pool based on the item's exponential factor
           item_bonus = (exponential_factor / total_exponential_factor) * adjusted_bonus_pool
