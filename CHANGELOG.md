@@ -1,14 +1,19 @@
 ## [Unreleased]
 
-## [0.5.1] - 2024-07-23
+## [0.5.2] - 2024-08-21
+- Fixed an issue in the `Exponential` strategy where `score_penalty` was not being applied to unranked items. Now, `score_penalty` is correctly applied to both ranked and unranked items, ensuring consistent scoring behavior.
 - Updated the `Exponential` strategy to prevent unranked items from receiving bonus points if the list contains both ranked and unranked items. In such cases, unranked items will now only receive the base weight of the list, ensuring ranked items are always prioritized.
 
-## [0.5.0] - 2024-07-23
+## [0.5.1] - 2024-08-21
+- Updated the `Exponential` strategy to prevent unranked items from receiving bonus points if the list contains both ranked and unranked items. In such cases, unranked items will now only receive the base weight of the list, ensuring ranked items are always prioritized.
+
+## [0.5.0] - 2024-08-21
 - Added `average_list_length` feature to the `Exponential` strategy to adjust the bonus pool based on the average number of items across all lists. This helps prevent smaller lists from receiving disproportionately large bonuses.
 - Introduced a new configuration option `include_unranked_items` in the `Exponential` strategy. When enabled, unranked items will receive an equal share of the bonus pool, while ranked items will receive an exponential bonus.
 - Updated RDoc documentation to explain the new `average_list_length` and `include_unranked_items` options.
 - Fixed test cases to correctly calculate expected values when using `average_list_length`.
 - Updated all dependencies to their latest versions.
+
 
 ## [0.4.2] - 2024-07-01
 - Fixed bug where a score could be set to 0. The lowest a score can be now is 1.

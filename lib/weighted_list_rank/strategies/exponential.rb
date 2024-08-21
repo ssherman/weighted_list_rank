@@ -45,36 +45,36 @@ module WeightedListRank
 
         if num_ranked_items > 0 && item.position.nil?
           # If there are ranked items, unranked items get no bonus, only the list's weight
-          return score
-        end
-
-        # Calculate the total bonus pool
-        total_bonus_pool = list.weight * bonus_pool_percentage
-
-        # Adjust the bonus pool based on the average list length
-        adjusted_bonus_pool = if average_list_length && average_list_length > 0
-          total_bonus_pool * (total_items / average_list_length.to_f)
+          score = list.weight
         else
-          total_bonus_pool
-        end
+          # Calculate the total bonus pool
+          total_bonus_pool = list.weight * bonus_pool_percentage
 
-        if item.position.nil?
-          # Unranked items get no bonus if there are ranked items
-          if include_unranked_items && num_ranked_items == 0
-            unranked_bonus = adjusted_bonus_pool / total_items
-            score += unranked_bonus
+          # Adjust the bonus pool based on the average list length
+          adjusted_bonus_pool = if average_list_length && average_list_length > 0
+            total_bonus_pool * (total_items / average_list_length.to_f)
+          else
+            total_bonus_pool
           end
-        else
-          # Ranked items receive a bonus calculated using the exponential formula
-          exponential_factor = (total_items + 1 - item.position)**exponent
-          total_exponential_factor = (1..total_items).sum { |pos| (total_items + 1 - pos)**exponent }
 
-          # Allocate a portion of the adjusted bonus pool based on the item's exponential factor
-          item_bonus = (exponential_factor / total_exponential_factor) * adjusted_bonus_pool
-          score += item_bonus
+          if item.position.nil?
+            # Unranked items get no bonus if there are ranked items
+            if include_unranked_items && num_ranked_items == 0
+              unranked_bonus = adjusted_bonus_pool / total_items
+              score += unranked_bonus
+            end
+          else
+            # Ranked items receive a bonus calculated using the exponential formula
+            exponential_factor = (total_items + 1 - item.position)**exponent
+            total_exponential_factor = (1..total_items).sum { |pos| (total_items + 1 - pos)**exponent }
+
+            # Allocate a portion of the adjusted bonus pool based on the item's exponential factor
+            item_bonus = (exponential_factor / total_exponential_factor) * adjusted_bonus_pool
+            score += item_bonus
+          end
         end
 
-        # Apply score penalty if it exists
+        # Apply score penalty if it exists, for both ranked and unranked items
         score = apply_penalty(score, item.score_penalty)
 
         # Ensure the score is not less than 1
