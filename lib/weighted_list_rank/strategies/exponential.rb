@@ -64,8 +64,16 @@ module WeightedListRank
               score += unranked_bonus
             end
           else
+            # Check if the item's position is higher than the total number of items
+            if item.position > total_items
+              puts "Warning: Item position (#{item.position}) is higher than the total number of items (#{total_items}) in the list. Using total items as position."
+              item_position = total_items
+            else
+              item_position = item.position
+            end
+
             # Ranked items receive a bonus calculated using the exponential formula
-            exponential_factor = (total_items + 1 - item.position)**exponent
+            exponential_factor = (total_items + 1 - item_position)**exponent
             total_exponential_factor = (1..total_items).sum { |pos| (total_items + 1 - pos)**exponent }
 
             # Allocate a portion of the adjusted bonus pool based on the item's exponential factor

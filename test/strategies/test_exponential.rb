@@ -33,6 +33,14 @@ module WeightedListRank
       @list_with_penalty_and_nil_position = MockList.new("List 5", 15, [
         MockItem.new("Item 9", nil, 0.15) # 15% penalty and nil position
       ])
+
+      # Add a new list with an item position higher than the total items
+      @list_with_high_position = MockList.new("List 7", 10, [
+        MockItem.new("Item 12", 1),
+        MockItem.new("Item 13", 5)  # This is fine
+      ])
+      @list_with_high_position.items << MockItem.new("Item 14", 10)  # This is the highest valid position
+      @list_with_high_position.items << MockItem.new("Item 15", 20)  # This position is too high
     end
 
     def test_calculate_score_with_default_exponent
@@ -111,6 +119,22 @@ module WeightedListRank
 
       # Even with average_list_length, items with nil position should just get the base weight.
       assert_equal 15, score_item_4, "Score should equal list weight for items with nil position"
+    end
+
+    def test_calculate_score_with_position_higher_than_total_items
+      # Capture the standard output to check for the warning message
+      output = capture_io do
+        # Calculate scores for all items, including the one with too high position
+        @list_with_high_position.items.each do |item|
+          score = @strategy.calculate_score(@list_with_high_position, item)
+
+          # Just assert that we get a numeric score without error
+          assert_kind_of Numeric, score, "Expected a numeric score for item with position #{item.position}"
+        end
+      end
+
+      # Check if the warning message was printed for the item with too high position
+      assert_match(/Warning: Item position \(20\) is higher than the total number of items \(4\) in the list. Using total items as position./, output.join)
     end
   end
 end

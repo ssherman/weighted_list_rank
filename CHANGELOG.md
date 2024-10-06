@@ -1,4 +1,7 @@
-## [Unreleased]
+## [0.5.3] - 2024-08-22
+- Fixed an issue in the `Exponential` strategy where items with positions higher than the total number of items in a list could cause errors. Now, such items are treated as if they were in the last position, and a warning is logged.
+- Added a new test case to verify the handling of items with positions exceeding the list size.
+- Updated all dependencies to their latest versions.
 
 ## [0.5.2] - 2024-08-21
 - Fixed an issue in the `Exponential` strategy where `score_penalty` was not being applied to unranked items. Now, `score_penalty` is correctly applied to both ranked and unranked items, ensuring consistent scoring behavior.

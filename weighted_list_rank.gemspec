@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_development_dependency "rubocop", "~> 1.0"
-  spec.add_development_dependency "standard", "~> 1.0"
+  spec.add_development_dependency "standard", ">= 1.35.1"
   spec.add_development_dependency "rubocop-minitest", "~> 0.3"
   spec.add_development_dependency "rubocop-rake", "~> 0.6"
   # For more information and examples about making a new gem, check out our
