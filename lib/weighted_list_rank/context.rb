@@ -3,12 +3,15 @@ module WeightedListRank
   # It aggregates scores for each item across all lists, based on the provided strategy.
   class RankingContext
     # @strategy: The strategy used for calculating scores.
-    attr_reader :strategy
+    # @list_count_penalties: Hash mapping list counts to penalty percentages (e.g., {1 => 0.50, 2 => 0.25})
+    attr_reader :strategy, :list_count_penalties
 
-    # Initializes a new RankingContext with an optional ranking strategy.
+    # Initializes a new RankingContext with an optional ranking strategy and list count penalties.
     # @param strategy [Strategy] the strategy to use for ranking items, defaults to Strategies::Exponential.
-    def initialize(strategy = Strategies::Exponential.new)
+    # @param list_count_penalties [Hash] hash mapping list counts to penalty percentages, defaults to empty hash.
+    def initialize(strategy = Strategies::Exponential.new, list_count_penalties: {})
       @strategy = strategy
+      @list_count_penalties = list_count_penalties
     end
 
     # Ranks items across multiple lists according to the strategy's score calculation.
@@ -30,8 +33,8 @@ module WeightedListRank
         end
       end
 
-      # Convert hash to a sorted array
-      sorted_items = items.map do |id, details|
+      # Convert hash to a formatted array
+      formatted_items = items.map do |id, details|
         {
           id: id,
           # Sort the score_details array by score in descending order before including it
@@ -40,8 +43,18 @@ module WeightedListRank
         }
       end
 
+      # Apply list count penalties if configured
+      if !list_count_penalties.empty?
+        formatted_items.each do |item|
+          list_count = item[:score_details].length
+          if (penalty = list_count_penalties[list_count])
+            item[:total_score] *= (1 - penalty)
+          end
+        end
+      end
+
       # Sort the array by total_score in descending order
-      sorted_items.sort_by { |item| -item[:total_score] }
+      formatted_items.sort_by { |item| -item[:total_score] }
     end
   end
 end

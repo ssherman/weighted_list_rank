@@ -1,3 +1,10 @@
+## [0.6.0] - 2025-06-29
+- Added `list_count_penalties` feature to `RankingContext` to allow penalizing items based on the number of lists they appear on. This is useful for de-emphasizing items that are not widely represented across your data.
+- The feature accepts a hash mapping list counts to penalty percentages (e.g., `{1 => 0.50, 2 => 0.25}` to penalize items on 1 list by 50% and items on 2 lists by 25%).
+- Penalties are applied to the total score after all list scores are aggregated but before sorting.
+- This feature is fully backwards compatible and stacks with individual item penalties.
+- Updated all dependencies to their latest versions.
+
 ## [0.5.3] - 2024-08-22
 - Fixed an issue in the `Exponential` strategy where items with positions higher than the total number of items in a list could cause errors. Now, such items are treated as if they were in the last position, and a warning is logged.
 - Added a new test case to verify the handling of items with positions exceeding the list size.

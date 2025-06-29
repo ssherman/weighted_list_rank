@@ -204,6 +204,31 @@ ranked_items.each do |item|
 end
 ```
 
+### Penalizing Items by Number of Lists
+You can optionally penalize items that appear on only a small number of lists. This is useful for de-emphasizing items that are not widely represented across your data. To use this feature, pass a `list_count_penalties` hash to the `RankingContext` constructor, where the keys are the number of lists and the values are the penalty percentages (as a float between 0 and 1).
+
+For example, to penalize items that appear on only 1 list by 50%, and items on 2 lists by 25%:
+
+```ruby
+list_count_penalties = {1 => 0.50, 2 => 0.25}
+ranking_context = WeightedListRank::RankingContext.new(
+  WeightedListRank::Strategies::Exponential.new,
+  list_count_penalties: list_count_penalties
+)
+
+ranked_items = ranking_context.rank([list1, list2, list3])
+```
+
+- Items that appear on only 1 list will have their total score multiplied by 0.5 (50% penalty).
+- Items that appear on only 2 lists will have their total score multiplied by 0.75 (25% penalty).
+- Items that appear on more lists will not be penalized unless specified in the hash.
+
+#### How it works
+- The penalty is applied to the total score of each item after all list scores are aggregated, but before sorting.
+- If an item appears on a number of lists not present in the hash, no penalty is applied.
+- This feature is fully backwards compatible: if you do not provide `list_count_penalties`, no penalties are applied.
+- This penalty stacks with individual item penalties (e.g., `score_penalty` on an item).
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

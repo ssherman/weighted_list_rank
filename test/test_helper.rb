@@ -8,7 +8,19 @@ module WeightedListRank
   class MockStrategy < Strategy
     def calculate_score(list, item)
       # Simple mock calculation based on item position
-      list.weight * (1.0 / item.position)
+      score = list.weight * (1.0 / item.position)
+
+      # Apply score penalty if it exists, similar to Exponential strategy
+      score = apply_penalty(score, item.score_penalty)
+
+      # Ensure the score is not less than 1
+      [score, 1].max
+    end
+
+    private
+
+    def apply_penalty(score, penalty)
+      penalty ? score * (1 - penalty) : score
     end
   end
 
